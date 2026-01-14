@@ -66,5 +66,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             InboxItemSeeder::class,
         ]);
+
+        // Week 9: Materials
+        $this->call([
+            MaterialSeeder::class,
+        ]);
     }
 }

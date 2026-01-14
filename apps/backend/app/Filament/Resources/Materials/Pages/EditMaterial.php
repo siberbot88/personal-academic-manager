@@ -16,4 +16,19 @@ class EditMaterial extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['tags'] = $this->record->tags->pluck('name')->toArray();
+        return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        if ($this->data['tags'] ?? null) {
+            $this->record->syncTags($this->data['tags']);
+        } else {
+            $this->record->detachTags($this->record->tags);
+        }
+    }
 }
