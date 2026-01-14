@@ -11,19 +11,7 @@ class InboxItem extends Model
 {
     use HasFactory, HasTags;
 
-    protected $fillable = [
-        'course_id',
-        'task_id',
-        'type',
-        'title',
-        'url',
-        'note',
-        'captured_at',
-        'source',
-        'status',
-        'promoted_to_material_id',
-        'processed_at',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'captured_at' => 'datetime',

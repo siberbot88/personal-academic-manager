@@ -13,16 +13,7 @@ class Material extends Model
 {
     use HasFactory, HasTags;
 
-    protected $fillable = [
-        'course_id',
-        'title',
-        'type',
-        'url',
-        'note',
-        'source',
-        'captured_at',
-        'inbox_item_id',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'captured_at' => 'datetime',

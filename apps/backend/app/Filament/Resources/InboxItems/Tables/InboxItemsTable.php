@@ -2,11 +2,17 @@
 
 namespace App\Filament\Resources\InboxItems\Tables;
 
+use App\Filament\Resources\Materials\MaterialResource;
+use App\Services\InboxPromoter;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -61,6 +67,14 @@ class InboxItemsTable
                         ->since(),
                 ])
             ->filters([
+                    SelectFilter::make('status')
+                        ->options([
+                                'inbox' => 'Inbox',
+                                'promoted' => 'Promoted',
+                                'archived' => 'Archived',
+                            ])
+                        ->default('inbox'),
+
                     SelectFilter::make('course_id')
                         ->label('Mata Kuliah')
                         ->relationship('course', 'name')
@@ -87,6 +101,49 @@ class InboxItemsTable
                         ->url(fn($record) => $record->url)
                         ->openUrlInNewTab()
                         ->color('primary'),
+
+                    Action::make('promote')
+                        ->label('Promote')
+                        ->icon('heroicon-o-arrow-up-tray')
+                        ->color('success')
+                        ->visible(fn($record) => $record->status === 'inbox')
+                        ->form(fn($record) => [
+                            Select::make('type')
+                                ->options([
+                                        'note' => 'Note',
+                                        'link' => 'Link',
+                                        'file' => 'File',
+                                    ])
+                                ->default($record->type ?? 'link')
+                                ->required(),
+                            TextInput::make('title')
+                                ->default($record->title)
+                                ->required(),
+                            Textarea::make('note')
+                                ->default($record->note),
+                        ])
+                        ->action(function (array $data, $record) {
+                            $promoter = new InboxPromoter();
+                            $material = $promoter->promoteToMaterial($record, [
+                                'type' => $data['type'],
+                                'title' => $data['title'],
+                                'note' => $data['note'],
+                                'task_ids' => $record->task_id ? [$record->task_id] : [],
+                            ]);
+
+                            Notification::make()->success()->title('Promoted to Material')->send();
+
+                            return redirect()->to(MaterialResource::getUrl('edit', ['record' => $material]));
+                        }),
+
+                    Action::make('archive')
+                        ->label('Archive')
+                        ->icon('heroicon-o-archive-box')
+                        ->color('gray')
+                        ->visible(fn($record) => $record->status === 'inbox')
+                        ->action(fn($record) => $record->update(['status' => 'archived']))
+                        ->requiresConfirmation(),
+
                     EditAction::make(),
                     DeleteAction::make(),
                 ])
