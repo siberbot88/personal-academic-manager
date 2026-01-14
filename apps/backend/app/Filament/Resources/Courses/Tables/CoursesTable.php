@@ -14,30 +14,31 @@ class CoursesTable
     {
         return $table
             ->columns([
-                TextColumn::make('semester_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
+                    TextColumn::make('semester.name')
+                        ->label('Semester Type')
+                        ->sortable()
+                        ->badge(),
+                    TextColumn::make('name')
+                        ->searchable(),
+                    TextColumn::make('created_at')
+                        ->dateTime()
+                        ->sortable()
+                        ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('updated_at')
+                        ->dateTime()
+                        ->sortable()
+                        ->toggleable(isToggledHiddenByDefault: true),
+                ])
             ->filters([
-                //
-            ])
+                    //
+                ])
             ->recordActions([
-                EditAction::make(),
-            ])
+                    EditAction::make(),
+                ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+                    BulkActionGroup::make([
+                        DeleteBulkAction::make(),
+                    ]),
+                ]);
     }
 }

@@ -5,17 +5,21 @@ namespace App\Filament\Resources\Courses\Schemas;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
+use Filament\Forms\Components\Select;
+
 class CourseForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('semester_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('name')
-                    ->required(),
-            ]);
+                    Select::make('semester_id')
+                        ->relationship('semester', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    TextInput::make('name')
+                        ->required(),
+                ]);
     }
 }

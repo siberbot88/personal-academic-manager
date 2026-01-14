@@ -1,0 +1,15 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/filament/pages/*.blade.php';
+
+/* Light Mode Overrides */
+html:not(.dark) .fi-body {
+    @apply bg-[#F5F5F5] text-[#333333];
+}
+
+html:not(.dark) .fi-layout,
+html:not(.dark) .fi-main {
+    background-color: #F5F5F5;
+}

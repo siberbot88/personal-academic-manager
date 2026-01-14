@@ -14,6 +14,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            PhaseTemplateSeeder::class,
+            TaskTypeTemplateSeeder::class,
+        ]);
+
         // 1 Semester
         $semester = Semester::create([
             'name' => 'Semester 5 - 2024/2025',
@@ -55,6 +60,11 @@ class DatabaseSeeder extends Seeder
             'due_date' => now()->subDays(2),
             'status' => 'Done',
             'progress' => 100,
+        ]);
+
+        // Week 8.5: Inbox Items
+        $this->call([
+            InboxItemSeeder::class,
         ]);
     }
 }

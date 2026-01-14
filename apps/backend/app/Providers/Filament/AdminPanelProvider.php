@@ -6,12 +6,10 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
+use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -30,8 +28,15 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->registration(false) // Disable registration - single user OAuth only
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#003366',
+                'warning' => '#FFCC00',
+                'success' => '#66CC99',
             ])
+            ->brandName('Personal Academic Manager')
+            ->brandLogo(asset('image/logo.png'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('image/logo.png'))
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -39,8 +44,7 @@ class AdminPanelProvider extends PanelProvider
                 ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                    AccountWidget::class,
-                    FilamentInfoWidget::class,
+                    // Widgets removed for Week 7 Top 3 Dashboard
                 ])
             ->middleware([
                     EncryptCookies::class,
@@ -60,5 +64,10 @@ class AdminPanelProvider extends PanelProvider
                 'panels::auth.login.form.after',
                 fn() => view('filament.login_extra')
             );
+    }
+
+    public function boot(): void
+    {
+        \App\Models\ChecklistItem::observe(\App\Observers\ChecklistItemObserver::class);
     }
 }

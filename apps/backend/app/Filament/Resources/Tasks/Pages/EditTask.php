@@ -13,6 +13,17 @@ class EditTask extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            \Filament\Actions\Action::make('regeneratePhases')
+                ->label('Regenerate Phases')
+                ->color('warning')
+                ->requiresConfirmation()
+                ->action(function () {
+                    app(\App\Services\TaskPhaseGenerator::class)->generate($this->getRecord());
+                    \Filament\Notifications\Notification::make()
+                        ->title('Phases Regenerated')
+                        ->success()
+                        ->send();
+                }),
             DeleteAction::make(),
         ];
     }
