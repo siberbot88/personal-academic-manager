@@ -32,10 +32,11 @@ class GoogleAuthController extends Controller
                 [
                     'name' => $googleUser->getName(),
                     'google_id' => $googleUser->getId(),
+                    'password' => bcrypt('oauth_user_' . str()->random(32)), // Filament needs password
                 ]
             );
 
-            Auth::login($user);
+            Auth::login($user, true); // remember = true
 
             return redirect()->intended('/admin');
         } catch (\Exception $e) {
