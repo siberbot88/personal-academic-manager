@@ -1,54 +1,74 @@
 <?php
 
+namespace Tests\Feature;
+
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
+use Mockery;
+use Tests\TestCase;
 
-test('non-whitelist user is rejected with 403', function () {
-    Config::set('auth.allowed_emails', 'allowed@example.com');
+class GoogleAuthTest extends TestCase
+{
+    use RefreshDatabase;
 
-    $socialiteUser = Mockery::mock(SocialiteUser::class);
-    $socialiteUser->shouldReceive('getEmail')
-        ->andReturn('notallowed@example.com');
-    $socialiteUser->shouldReceive('getName')
-        ->andReturn('Not Allowed');
-    $socialiteUser->shouldReceive('getId')
-        ->andReturn('12345');
+    public function test_non_whitelist_user_is_rejected_with_403(): void
+    {
+        Config::set('auth.allowed_emails', 'allowed@example.com');
 
-    Socialite::shouldReceive('driver')
-        ->with('google')
-        ->andReturnSelf();
-    Socialite::shouldReceive('user')
-        ->andReturn($socialiteUser);
+        $socialiteUser = Mockery::mock(SocialiteUser::class);
+        $socialiteUser->shouldReceive('getEmail')
+            ->andReturn('notallowed@example.com');
+        $socialiteUser->shouldReceive('getName')
+            ->andReturn('Not Allowed');
+        $socialiteUser->shouldReceive('getId')
+            ->andReturn('12345');
 
-    $response = $this->get('/auth/google/callback');
+        Socialite::shouldReceive('driver')
+            ->with('google')
+            ->andReturnSelf();
+        Socialite::shouldReceive('user')
+            ->andReturn($socialiteUser);
 
-    $response->assertStatus(403);
-    $response->assertSeeText('Email not authorized');
-});
+        $response = $this->get('/auth/google/callback');
 
-test('whitelisted user can login successfully', function () {
-    Config::set('auth.allowed_emails', 'allowed@example.com,test@example.com');
+        $response->assertStatus(403);
+        $response->assertSee('Email not authorized');
+    }
 
-    $socialiteUser = Mockery::mock(SocialiteUser::class);
-    $socialiteUser->shouldReceive('getEmail')
-        ->andReturn('allowed@example.com');
-    $socialiteUser->shouldReceive('getName')
-        ->andReturn('Allowed User');
-    $socialiteUser->shouldReceive('getId')
-        ->andReturn('67890');
+    public function test_whitelisted_user_can_login_successfully(): void
+    {
+        Config::set('auth.allowed_emails', 'allowed@example.com,test@example.com');
 
-    Socialite::shouldReceive('driver')
-        ->with('google')
-        ->andReturnSelf();
-    Socialite::shouldReceive('user')
-        ->andReturn($socialiteUser);
+        $socialiteUser = Mockery::mock(SocialiteUser::class);
+        $socialiteUser->shouldReceive('getEmail')
+            ->andReturn('allowed@example.com');
+        $socialiteUser->shouldReceive('getName')
+            ->andReturn('Allowed User');
+        $socialiteUser->shouldReceive('getId')
+            ->andReturn('67890');
 
-    $response = $this->get('/auth/google/callback');
+        Socialite::shouldReceive('driver')
+            ->with('google')
+            ->andReturnSelf();
+        Socialite::shouldReceive('user')
+            ->andReturn($socialiteUser);
 
-    $response->assertRedirect('/admin');
-    $this->assertAuthenticated();
+        $response = $this->get('/auth/google/callback');
 
-    expect(User::where('email', 'allowed@example.com')->exists())->toBeTrue();
-});
+        $response->assertRedirect('/admin');
+        $this->assertAuthenticated();
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'allowed@example.com',
+        ]);
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
+}
