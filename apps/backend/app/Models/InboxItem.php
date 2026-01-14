@@ -20,10 +20,14 @@ class InboxItem extends Model
         'note',
         'captured_at',
         'source',
+        'status',
+        'promoted_to_material_id',
+        'processed_at',
     ];
 
     protected $casts = [
         'captured_at' => 'datetime',
+        'processed_at' => 'datetime',
     ];
 
     // Relations
@@ -35,6 +39,11 @@ class InboxItem extends Model
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
+    }
+
+    public function promotedMaterial(): BelongsTo
+    {
+        return $this->belongsTo(Material::class, 'promoted_to_material_id');
     }
 
     // Mutator: normalize URL
