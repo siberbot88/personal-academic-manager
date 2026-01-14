@@ -63,10 +63,15 @@ class TaskValidationTest extends TestCase
             'name' => 'Test Course',
         ]);
 
-        $task = Task::create([
+        // Don't pass status - let database default apply
+        $task = new Task([
             'title' => 'Test Task Status Default',
             'primary_course_id' => $course->id,
         ]);
+        $task->save(); // Use save() instead of create() to trigger DB defaults
+
+        // Refresh to get DB defaults
+        $task->refresh();
 
         $this->assertEquals('Active', $task->status);
         $this->assertEquals(0, $task->progress);
