@@ -38,7 +38,6 @@ class Material extends Model
     public function attachments(): MorphToMany
     {
         return $this->morphToMany(Attachment::class, 'attachmentable', 'attachmentables')
-            ->withPivot('role')
-            ->withTimestamps();
+            ->withPivot('role');
     }
 }

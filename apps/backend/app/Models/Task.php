@@ -29,10 +29,13 @@ class Task extends Model
         'attention_flag',
         'priority_boost',
         'stagnation_days',
+        'first_touched_at',
+        'started_lead_days',
     ];
 
     protected $casts = [
         'due_date' => 'date',
+        'first_touched_at' => 'datetime',
         'progress' => 'integer',
         'health_score' => 'integer',
         'last_progress_at' => 'datetime',
@@ -40,6 +43,37 @@ class Task extends Model
         'priority_boost' => 'boolean',
         'stagnation_days' => 'integer',
     ];
+
+    /**
+     * Idempotent method to mark task as started.
+     */
+    public function markAsStarted()
+    {
+        if ($this->first_touched_at) {
+            return;
+        }
+
+        $this->first_touched_at = now();
+
+        if ($this->due_date) {
+            // false = absolute difference without rounding, using standard diffInDays for integer
+            // we want integer days.
+            $this->started_lead_days = $this->first_touched_at->diffInDays($this->due_date, false);
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Check if task was started before H-7 (7 days before due date).
+     */
+    public function getStartedBeforeH7Attribute(): bool
+    {
+        if (is_null($this->started_lead_days)) {
+            return false;
+        }
+        return $this->started_lead_days >= 7;
+    }
 
     public function primaryCourse()
     {

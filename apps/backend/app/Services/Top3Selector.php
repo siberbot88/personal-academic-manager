@@ -24,12 +24,12 @@ class Top3Selector
 
         $candidates = Task::query()
             ->where('status', 'Active')
-            ->with('primaryCourse')
+            ->with(['primaryCourse', 'taskPhases.checklistItems'])
             ->addSelect([
-                    'nearest_phase_due' => TaskPhase::selectRaw('MIN(due_date)')
-                        ->whereColumn('task_id', 'tasks.id')
-                        ->where('progress_pct', '<', 100) // Only open phases
-                ])
+                'nearest_phase_due' => TaskPhase::selectRaw('MIN(due_date)')
+                    ->whereColumn('task_id', 'tasks.id')
+                    ->where('progress_pct', '<', 100) // Only open phases
+            ])
             // Optimization: Get raw due_date for fallback
             ->orderBy('priority_boost', 'desc')
             ->orderBy('health_score', 'asc')

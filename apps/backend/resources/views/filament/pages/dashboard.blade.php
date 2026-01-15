@@ -38,9 +38,32 @@
                                 {{ $task->primaryCourse->name ?? 'No Course' }}
                             </div>
                             <h3
-                                class="text-2xl font-bold text-gray-900 dark:text-white mb-3 leading-tight tracking-tight line-clamp-2">
+                                class="text-2xl font-bold text-gray-900 dark:text-white mb-2 leading-tight tracking-tight line-clamp-2">
                                 {{ $task->title }}
                             </h3>
+
+                            {{-- Next Action --}}
+                            @php
+                                $nextAction = 'Tentukan next action (≤30 menit)';
+                                // Find active phase (not 100%)
+                                $activePhase = $task->taskPhases->where('progress_pct', '<', 100)->sortBy('sort_order')->first();
+                                if ($activePhase) {
+                                    $nextItem = $activePhase->checklistItems->where('is_completed', false)->first();
+                                    if ($nextItem) {
+                                        $nextAction = $nextItem->content;
+                                    } else {
+                                        $nextAction = "Selesaikan fase: " . $activePhase->name;
+                                    }
+                                }
+                            @endphp
+                            <div class="mb-4">
+                                <div class="text-xs font-bold text-gray-500 uppercase mb-1">Next Action:</div>
+                                <div
+                                    class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700">
+                                    <x-filament::icon icon="heroicon-m-chevron-right" class="w-4 h-4 text-primary-500 mt-0.5" />
+                                    <span class="line-clamp-2 leading-snug">{{ $nextAction }}</span>
+                                </div>
+                            </div>
 
                             <div class="flex flex-wrap items-center gap-3">
                                 <div
@@ -60,9 +83,16 @@
 
                         {{-- Actions --}}
                         <div class="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-                            <x-filament::button wire:click="openTask({{ $task->id }})" color="gray" outlined size="sm">
-                                Buka
-                            </x-filament::button>
+                            @if(!$task->first_touched_at)
+                                <x-filament::button wire:click="markStarted({{ $task->id }})" color="primary" size="sm"
+                                    icon="heroicon-m-play">
+                                    Mulai
+                                </x-filament::button>
+                            @else
+                                <x-filament::button wire:click="openTask({{ $task->id }})" color="gray" outlined size="sm">
+                                    Buka
+                                </x-filament::button>
+                            @endif
 
                             <x-filament::button wire:click="markDone({{ $task->id }})" color="success" size="sm"
                                 icon="heroicon-m-check">

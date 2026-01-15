@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
+use App\Filament\Resources\Tasks\TaskResource;
 
 class Dashboard extends Page
 {
@@ -25,7 +26,100 @@ class Dashboard extends Page
         ];
     }
 
-    // Actions
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\StudyProgressWidget::class,
+        ];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            \Filament\Actions\Action::make('log_session')
+                ->label('Log Sesi')
+                ->icon('heroicon-m-clock')
+                ->color('primary')
+                ->form([
+                    \Filament\Forms\Components\Select::make('course_id')
+                        ->label('Course')
+                        ->options(\App\Models\Course::pluck('name', 'id'))
+                        ->searchable()
+                        ->placeholder('Pilih Mata Kuliah'),
+                    \Filament\Forms\Components\Select::make('task_id')
+                        ->label('Task')
+                        ->options(\App\Models\Task::where('status', '!=', 'archived')->pluck('title', 'id'))
+                        ->searchable()
+                        ->placeholder('Pilih Tugas'),
+                    \Filament\Forms\Components\ToggleButtons::make('duration_min')
+                        ->label('Durasi')
+                        ->options([
+                            25 => '25m (Pomodoro)',
+                            50 => '50m (Deep Work)',
+                            120 => '120m (Marathon)',
+                        ])
+                        ->default(50)
+                        ->inline()
+                        ->required(),
+                    \Filament\Forms\Components\ToggleButtons::make('mode')
+                        ->label('Mode')
+                        ->options([
+                            'study' => 'Belajar',
+                            'review' => 'Review',
+                            'writing' => 'Nulis',
+                        ])
+                        ->default('study')
+                        ->inline()
+                        ->required(),
+                    \Filament\Forms\Components\Textarea::make('note')
+                        ->label('Catatan')
+                        ->rows(2),
+                ])
+                ->action(function (array $data) {
+                    $session = \App\Models\StudySession::create([
+                        'user_id' => auth()->id(),
+                        'course_id' => $data['course_id'] ?? null,
+                        'task_id' => $data['task_id'] ?? null,
+                        'started_at' => now()->subMinutes($data['duration_min']),
+                        'ended_at' => now(),
+                        'duration_min' => $data['duration_min'],
+                        'mode' => $data['mode'],
+                        'note' => $data['note'],
+                    ]);
+
+                    if ($session->task_id && $session->task) {
+                        $session->task->markAsStarted();
+                    }
+
+                    \Filament\Notifications\Notification::make()
+                        ->title("Sesi {$data['duration_min']} menit tercatat!")
+                        ->success()
+                        ->send();
+
+                    // Refresh widgets? Livewire page reloads?
+                }),
+
+            \Filament\Actions\Action::make('create_task')
+                ->label('Buat Task')
+                ->icon('heroicon-m-plus')
+                ->color('gray')
+                ->url(\App\Filament\Resources\Tasks\TaskResource::getUrl('create')),
+        ];
+    }
+
+    public function markStarted(int $taskId)
+    {
+        $task = \App\Models\Task::find($taskId);
+        if ($task) {
+            $task->markAsStarted();
+
+            \Filament\Notifications\Notification::make()
+                ->title('Task Dimulai!')
+                ->success()
+                ->send();
+        }
+    }
+
     public function markDone(int $taskId)
     {
         $task = \App\Models\Task::find($taskId);
@@ -54,8 +148,10 @@ class Dashboard extends Page
         }
     }
 
+
+
     public function openTask(int $taskId)
     {
-        return redirect()->to(\App\Filament\Resources\Tasks\TaskResource::getUrl('edit', ['record' => $taskId]));
+        return redirect()->to(TaskResource::getUrl('edit', ['record' => $taskId]));
     }
 }

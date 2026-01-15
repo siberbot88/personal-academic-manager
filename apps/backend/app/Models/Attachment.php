@@ -21,30 +21,53 @@ class Attachment extends Model
         'uploaded_at',
         'label',
         'note',
+        'attachment_group_id',
+        'version_number',
+        'is_current',
+        'is_final',
     ];
 
     protected $casts = [
         'uploaded_at' => 'datetime',
+        'is_current' => 'boolean',
+        'is_final' => 'boolean',
     ];
+
+    public function group()
+    {
+        return $this->belongsTo(AttachmentGroup::class, 'attachment_group_id');
+    }
 
     // Polymorphic relations
     public function materials(): MorphToMany
     {
         return $this->morphedByMany(Material::class, 'attachmentable', 'attachmentables')
-            ->withPivot('role')
-            ->withTimestamps();
+            ->withPivot('role');
     }
 
     public function tasks(): MorphToMany
     {
         return $this->morphedByMany(Task::class, 'attachmentable', 'attachmentables')
-            ->withPivot('role')
-            ->withTimestamps();
+            ->withPivot('role');
     }
 
     // Helper methods
     public function getDownloadResponse()
     {
+        if ($this->storage_driver === 'r2') {
+            /** @var \Aws\S3\S3Client $s3 */
+            $s3 = \App\Support\R2ClientFactory::make();
+            $cmd = $s3->getCommand('GetObject', [
+                'Bucket' => config('pam.r2.bucket'),
+                'Key' => $this->storage_path,
+                'ResponseContentDisposition' => 'attachment; filename="' . $this->original_name . '"',
+            ]);
+
+            $request = $s3->createPresignedRequest($cmd, '+15 minutes');
+            return redirect((string) $request->getUri());
+        }
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
         $disk = Storage::disk($this->storage_driver === 'local_private' ? 'private' : $this->storage_driver);
 
         return $disk->download($this->storage_path, $this->original_name);

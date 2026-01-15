@@ -25,41 +25,45 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
             ->registration(false) // Disable registration - single user OAuth only
+            ->login(\App\Filament\Pages\Auth\CustomLogin::class)
             ->colors([
-                'primary' => '#003366',
-                'warning' => '#FFCC00',
-                'success' => '#66CC99',
+                'primary' => '#003366', // Deep Blue
+                'danger' => Color::Red,
+                'gray' => Color::Slate,
+                'info' => Color::Blue,
+                'success' => '#66CC99', // Mint Green
+                'warning' => '#FFCC00', // Accent Yellow
             ])
+            ->font('Inter')
             ->brandName('Personal Academic Manager')
             ->brandLogo(asset('image/logo.png'))
             ->brandLogoHeight('2.5rem')
-            ->favicon(asset('image/logo.png'))
+            ->favicon(asset('favicon.ico'))
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                    Dashboard::class,
-                ])
+                Dashboard::class,
+            ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                    // Widgets removed for Week 7 Top 3 Dashboard
-                ])
+                // Widgets removed for Week 7 Top 3 Dashboard
+            ])
             ->middleware([
-                    EncryptCookies::class,
-                    AddQueuedCookiesToResponse::class,
-                    StartSession::class,
-                    AuthenticateSession::class,
-                    ShareErrorsFromSession::class,
-                    VerifyCsrfToken::class,
-                    SubstituteBindings::class,
-                    DisableBladeIconComponents::class,
-                    DispatchServingFilamentEvent::class,
-                ])
+                EncryptCookies::class,
+                AddQueuedCookiesToResponse::class,
+                StartSession::class,
+                AuthenticateSession::class,
+                ShareErrorsFromSession::class,
+                VerifyCsrfToken::class,
+                SubstituteBindings::class,
+                DisableBladeIconComponents::class,
+                DispatchServingFilamentEvent::class,
+            ])
             ->authMiddleware([
-                    Authenticate::class,
-                ])
+                Authenticate::class,
+            ])
             ->renderHook(
                 'panels::auth.login.form.after',
                 fn() => view('filament.login_extra')
