@@ -7,21 +7,27 @@ use Illuminate\Database\Seeder;
 
 class PhaseTemplateSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         $phases = [
-            ['name' => 'Riset', 'sort_order' => 1, 'is_default' => true],
-            ['name' => 'Draft', 'sort_order' => 2, 'is_default' => true],
-            ['name' => 'Struktur', 'sort_order' => 3, 'is_default' => true],
-            ['name' => 'Revisi & Penyempurnaan', 'sort_order' => 4, 'is_default' => true],
-            ['name' => 'Finalisasi', 'sort_order' => 5, 'is_default' => true],
+            ['name' => 'Riset & Referensi', 'sort_order' => 1, 'is_default' => true],
+            ['name' => 'Penulisan Draft', 'sort_order' => 2, 'is_default' => true],
+            ['name' => 'Revisi & Perbaikan', 'sort_order' => 3, 'is_default' => true],
+            ['name' => 'Finalisasi', 'sort_order' => 4, 'is_default' => true],
+            ['name' => 'Submit & Serahkan', 'sort_order' => 5, 'is_default' => true],
         ];
 
         foreach ($phases as $phase) {
-            PhaseTemplate::firstOrCreate(
+            PhaseTemplate::updateOrCreate(
                 ['name' => $phase['name']],
-                $phase
+                [
+                    'sort_order' => $phase['sort_order'],
+                    'is_default' => $phase['is_default'],
+                    'is_active' => true,
+                ]
             );
         }
+
+        $this->command->info('✓ PhaseTemplate seeded (5 phases)');
     }
 }

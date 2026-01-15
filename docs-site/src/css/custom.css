@@ -1,0 +1,220 @@
+/**
+ * Custom CSS for Personal Academic Manager Docs
+ * Brand Colors: #003366 (Primary), #FFCC00 (Accent), #66CC99 (Success)
+ */
+
+/* Brand Color Variables */
+:root {
+  /* Primary - Deep Blue */
+  --ifm-color-primary: #003366;
+  --ifm-color-primary-dark: #002952;
+  --ifm-color-primary-darker: #00264d;
+  --ifm-color-primary-darkest: #001f3d;
+  --ifm-color-primary-light: #004080;
+  --ifm-color-primary-lighter: #004d99;
+  --ifm-color-primary-lightest: #0066cc;
+
+  /* Accent - Yellow */
+  --ifm-color-warning: #FFCC00;
+  --ifm-color-warning-dark: #e6b800;
+  --ifm-color-warning-darker: #ccaa00;
+
+  /* Success - Mint Green */
+  --ifm-color-success: #66CC99;
+  --ifm-color-success-dark: #52b885;
+  --ifm-color-success-darker: #47ad7a;
+
+  /* Background & Text */
+  --ifm-background-color: #F5F5F5;
+  --ifm-font-color-base: #333333;
+
+  /* Typography */
+  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  --ifm-heading-font-weight: 600;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.7;
+  --ifm-code-font-size: 90%;
+
+  /* Sidebar */
+  --ifm-sidebar-width: 280px;
+  --doc-sidebar-width: 280px;
+
+  /* Code blocks */
+  --docusaurus-highlighted-code-line-bg: rgba(0, 51, 102, 0.1);
+}
+
+/* Dark Mode Colors */
+[data-theme='dark'] {
+  --ifm-color-primary: #4d9fff;
+  --ifm-color-primary-dark: #3388ff;
+  --ifm-color-primary-darker: #1a77ff;
+  --ifm-color-primary-darkest: #0066ff;
+  --ifm-color-primary-light: #66aaff;
+  --ifm-color-primary-lighter: #80bbff;
+  --ifm-color-primary-lightest: #99ccff;
+
+  --ifm-background-color: #1a1a1a;
+  --ifm-font-color-base: #e6e6e6;
+
+  --docusaurus-highlighted-code-line-bg: rgba(77, 159, 255, 0.2);
+}
+
+/* Typography Improvements */
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  border-bottom: 2px solid var(--ifm-color-primary-lightest);
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+}
+
+/* Sidebar Active Item */
+.theme-doc-sidebar-item-link-level-1.menu__link--active {
+  background: linear-gradient(to right, var(--ifm-color-primary), var(--ifm-color-primary-light));
+  color: white !important;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.menu__link:hover {
+  background-color: rgba(0, 51, 102, 0.08);
+}
+
+[data-theme='dark'] .menu__link:hover {
+  background-color: rgba(77, 159, 255, 0.12);
+}
+
+/* Table of Contents */
+.table-of-contents {
+  font-size: 0.9rem;
+}
+
+.table-of-contents__link:hover {
+  color: var(--ifm-color-primary);
+}
+
+.table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+  border-left: 3px solid var(--ifm-color-primary);
+  padding-left: calc(var(--ifm-toc-padding-horizontal) - 3px);
+}
+
+/* Admonitions */
+.admonition {
+  border-radius: 8px;
+  border-left-width: 4px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.admonition-heading {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.admonition-tip {
+  border-left-color: var(--ifm-color-success);
+  background-color: rgba(102, 204, 153, 0.1);
+}
+
+.admonition-warning {
+  border-left-color: var(--ifm-color-warning);
+  background-color: rgba(255, 204, 0, 0.1);
+}
+
+/* Code Blocks */
+pre {
+  border-radius: 8px;
+  border: 1px solid rgba(0, 51, 102, 0.1);
+}
+
+[data-theme='dark'] pre {
+  border-color: rgba(77, 159, 255, 0.2);
+}
+
+code {
+  background-color: rgba(0, 51, 102, 0.08);
+  color: var(--ifm-code-color);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: var(--ifm-code-font-size);
+}
+
+[data-theme='dark'] code {
+  background-color: rgba(77, 159, 255, 0.15);
+}
+
+/* Content Max Width */
+.markdown {
+  max-width: 800px;
+}
+
+/* Breadcrumbs */
+.breadcrumbs__item--active .breadcrumbs__link {
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+/* Navbar Logo/Title */
+.navbar__title {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--ifm-color-primary);
+}
+
+[data-theme='dark'] .navbar__title {
+  color: var(--ifm-color-primary-lightest);
+}
+
+/* Pagination Nav */
+.pagination-nav__link {
+  border-radius: 8px;
+  border: 1px solid rgba(0, 51, 102, 0.2);
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--ifm-color-primary);
+  background-color: rgba(0, 51, 102, 0.05);
+}
+
+/* Tables */
+table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+th {
+  background-color: rgba(0, 51, 102, 0.08);
+  font-weight: 600;
+  padding: 0.75rem;
+}
+
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0, 51, 102, 0.1);
+}
+
+[data-theme='dark'] th {
+  background-color: rgba(77, 159, 255, 0.15);
+}
+
+[data-theme='dark'] td {
+  border-bottom-color: rgba(77, 159, 255, 0.2);
+}
